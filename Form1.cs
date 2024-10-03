@@ -210,14 +210,16 @@ namespace SistemaCobro
 
             try
             {
-                // Crear el documento PDF con tamaño A4
-                using (Document documento = new Document(PageSize.A4, 50, 50, 25, 25))
-                {
-                    PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
-                    documento.Open();
+                Rectangle tamañoPapel = new Rectangle(288f, 500f); // 288 puntos = 4 pulgadas, altura arbitrariamente grande
 
-                    // Definir fuentes
-                    BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                // Crear el documento PDF con el tamaño personalizado
+                Document documento = new Document(tamañoPapel, 10f, 10f, 10f, 10f); // Márgenes reducidos
+                PdfWriter writer = PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
+
+                documento.Open();
+
+                // Definir fuentes
+                    BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_BOLDITALIC, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                     Font fuenteTitulo = new Font(bf, 16, iTextSharp.text.Font.BOLD);
                     Font fuenteNormal = new Font(bf, 12, iTextSharp.text.Font.NORMAL);
                     Font fuenteNegrita = new Font(bf, 12, iTextSharp.text.Font.BOLD);
@@ -251,7 +253,7 @@ namespace SistemaCobro
                     tituloPago.Alignment = Element.ALIGN_CENTER;
                     documento.Add(tituloPago);
 
-                    documento.Add(new Paragraph("-----------------------------------------------------------------------", fuenteNormal));
+                    documento.Add(new Paragraph("----------------------------------------------------------------", fuenteNormal));
 
                     // Función para agregar detalles con alineación y formato
                     void AgregarDetalle(string etiqueta, string valor)
@@ -269,12 +271,16 @@ namespace SistemaCobro
                     AgregarDetalle("Tipo de Pago", tipoPago);
                     AgregarDetalle("Monto Pagado", montoPago.ToString("C"));
 
-                    documento.Add(new Paragraph("-----------------------------------------------------------------------", fuenteNormal));
+                    documento.Add(new Paragraph("-------------------------------------------------------------------", fuenteNormal));
 
                     Paragraph gracias = new Paragraph("Gracias por su pago.", fuenteNegrita);
                     gracias.Alignment = Element.ALIGN_CENTER;
                     documento.Add(gracias);
-                }
+                    float altoReal = writer.GetVerticalPosition(false) - documento.BottomMargin;
+                    documento.SetPageSize(new Rectangle(288f, altoReal));
+
+                    documento.Close();
+
 
                 // Confirmar al usuario que el comprobante fue generado
                 MessageBox.Show($"Comprobante PDF generado exitosamente.\nRuta: {rutaCompleta}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -287,6 +293,12 @@ namespace SistemaCobro
                 // Manejar errores durante la generación del PDF
                 MessageBox.Show($"Error al generar el comprobante PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnReporte_Click(object sender, EventArgs e)
+        {
+            Form reporte = new Reportes();
+            reporte.Show();
         }
     }
 }

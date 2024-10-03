@@ -46,6 +46,7 @@ namespace SistemaCobro
             this.RbMensual = new System.Windows.Forms.RadioButton();
             this.RbAnual = new System.Windows.Forms.RadioButton();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnReporte = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -194,7 +195,7 @@ namespace SistemaCobro
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(665, 269);
+            this.button1.Location = new System.Drawing.Point(652, 259);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 37);
             this.button1.TabIndex = 16;
@@ -202,11 +203,22 @@ namespace SistemaCobro
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
+            // btnReporte
+            // 
+            this.btnReporte.Location = new System.Drawing.Point(604, 131);
+            this.btnReporte.Name = "btnReporte";
+            this.btnReporte.Size = new System.Drawing.Size(106, 32);
+            this.btnReporte.TabIndex = 17;
+            this.btnReporte.Text = "Reportes";
+            this.btnReporte.UseVisualStyleBackColor = true;
+            this.btnReporte.Click += new System.EventHandler(this.btnReporte_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnReporte);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.RbAnual);
             this.Controls.Add(this.RbMensual);
@@ -251,6 +263,7 @@ namespace SistemaCobro
         private System.Windows.Forms.RadioButton RbMensual;
         private System.Windows.Forms.RadioButton RbAnual;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnReporte;
     }
 }
 
