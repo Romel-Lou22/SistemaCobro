@@ -131,6 +131,7 @@ namespace SistemaCobro
             this.Controls.Add(this.txtBuscar);
             this.Controls.Add(this.label4);
             this.Name = "Reportes";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.Reportes_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPagos)).EndInit();
             this.ResumeLayout(false);
