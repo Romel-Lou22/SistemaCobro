@@ -156,5 +156,10 @@ namespace SistemaCobro
             txtPasword.ForeColor = System.Drawing.Color.Gray;
             txtPasword.PasswordChar = '\0';  // Mostrar texto como placeholder
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -21,6 +21,14 @@ namespace SistemaCobro
         // Evento al cargar el formulario
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Configurar el texto del ToolTip para txtBuscar
+           toolTip.SetToolTip(txtBuscar, "Ingrese cedula, código o nombres completos para buscar.");
+
+            // Opcional: Configurar el tiempo que el tooltip permanecerá visible
+            toolTip.AutoPopDelay = 5000;  // Tiempo en milisegundos (5 segundos)
+            toolTip.InitialDelay = 100;   // Retraso inicial en milisegundos
+            toolTip.ReshowDelay = 500;    // Tiempo entre mostrar el tooltip nuevamente
+            toolTip.ShowAlways = true;    
 
         }
 
@@ -55,62 +63,65 @@ namespace SistemaCobro
         //BTNBUSCAR
         private void btnBuscar_Click_1(object sender, EventArgs e)
         {
-            string query = "";
-
-            // Check if the search text is a number (to search by CodigoUsuario or Cedula)
-            bool isNumeric = long.TryParse(txtBuscar.Text, out _);
-
-            // Modify the query based on the input type
-            if (isNumeric)
+            if (ValidarEntrada())
             {
-                query = "SELECT CodigoUsuario, Cedula, UsuarioSistema FROM Usuarios WHERE Cedula = @cedula OR CodigoUsuario = @codigo";
-            }
-            else
-            {
-                query = "SELECT CodigoUsuario, Cedula, UsuarioSistema FROM Usuarios WHERE UsuarioSistema LIKE @nombres";
-            }
+                string query = "";
 
-            // Connect to the database
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                try
+                // Check if the search text is a number (to search by CodigoUsuario or Cedula)
+                bool isNumeric = long.TryParse(txtBuscar.Text, out _);
+
+                // Modify the query based on the input type
+                if (isNumeric)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(query, conn);
-
-                    if (isNumeric)
-                    {
-                        // Set parameters for numeric search
-                        cmd.Parameters.Add(new SqlParameter("@cedula", System.Data.SqlDbType.VarChar) { Value = txtBuscar.Text });
-                        cmd.Parameters.Add(new SqlParameter("@codigo", System.Data.SqlDbType.BigInt) { Value = Convert.ToInt64(txtBuscar.Text) });
-                    }
-                    else
-                    {
-                        // Set parameters for name search
-                        cmd.Parameters.Add(new SqlParameter("@nombres", System.Data.SqlDbType.NVarChar) { Value = "%" + txtBuscar.Text + "%" });
-                    }
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    // Check if any results were found
-                    if (reader.Read())
-                    {
-                        txtCodigo.Text = reader["CodigoUsuario"].ToString();
-                        txtCedula.Text = reader["Cedula"].ToString();
-                        txtNombres.Text = reader["UsuarioSistema"].ToString();
-                    }
-                    else
-                    {
-                        MessageBox.Show("No se encontraron resultados.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    query = "SELECT CodigoUsuario, Cedula, UsuarioSistema FROM Usuarios WHERE Cedula = @cedula OR CodigoUsuario = @codigo";
                 }
-                catch (SqlException ex)
+                else
                 {
-                    MessageBox.Show("Error SQL: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    query = "SELECT CodigoUsuario, Cedula, UsuarioSistema FROM Usuarios WHERE UsuarioSistema LIKE @nombres";
                 }
-                catch (Exception ex)
+
+                // Connect to the database
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    try
+                    {
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand(query, conn);
+
+                        if (isNumeric)
+                        {
+                            // Set parameters for numeric search
+                            cmd.Parameters.Add(new SqlParameter("@cedula", System.Data.SqlDbType.VarChar) { Value = txtBuscar.Text });
+                            cmd.Parameters.Add(new SqlParameter("@codigo", System.Data.SqlDbType.BigInt) { Value = Convert.ToInt64(txtBuscar.Text) });
+                        }
+                        else
+                        {
+                            // Set parameters for name search
+                            cmd.Parameters.Add(new SqlParameter("@nombres", System.Data.SqlDbType.NVarChar) { Value = "%" + txtBuscar.Text + "%" });
+                        }
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        // Check if any results were found
+                        if (reader.Read())
+                        {
+                            txtCodigo.Text = reader["CodigoUsuario"].ToString();
+                            txtCedula.Text = reader["Cedula"].ToString();
+                            txtNombres.Text = reader["UsuarioSistema"].ToString();
+                        }
+                        else
+                        {
+                            MessageBox.Show("No se encontraron resultados.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show("Error SQL: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
 
@@ -144,35 +155,74 @@ namespace SistemaCobro
             string nombres = txtNombres.Text;
             DateTime fechaPago = Date.Value; // Usar la fecha seleccionada en el DateTimePicker
 
-            // Insertar los datos en la base de datos
-            string query = "INSERT INTO Pagos (CodigoUsuario, Cedula, UsuarioSistema, FechaPago, MontoPago, TipoPago) " +
-                           "VALUES (@codigoUsuario, @cedula, @nombres, @fechaPago, @montoPago, @tipoPago)";
-
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open(); // Abrir la conexión
-                    SqlCommand cmd = new SqlCommand(query, conn);
 
-                    // Añadir los parámetros para la consulta
-                    cmd.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
-                    cmd.Parameters.AddWithValue("@cedula", cedula);
-                    cmd.Parameters.AddWithValue("@nombres", nombres);
-                    cmd.Parameters.AddWithValue("@fechaPago", fechaPago); // Usar la fecha del DateTimePicker
-                    cmd.Parameters.AddWithValue("@montoPago", montoPago);
-                    cmd.Parameters.AddWithValue("@tipoPago", tipoPago);
-
-                    // Ejecutar la consulta de inserción
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
+                    // Validar si ya existe un pago según el tipo
+                    string validationQuery = "";
+                    if (tipoPago == "Mensual")
                     {
-                        MessageBox.Show("Pago registrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        validationQuery = @"SELECT COUNT(*) FROM Pagos 
+                                    WHERE CodigoUsuario = @codigoUsuario 
+                                    AND MONTH(FechaPago) = MONTH(@fechaPago) 
+                                    AND YEAR(FechaPago) = YEAR(@fechaPago)";
                     }
-                    else
+                    else // Anual
                     {
-                        MessageBox.Show("No se pudo registrar el pago. Intente nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        validationQuery = @"SELECT COUNT(*) FROM Pagos 
+                                    WHERE CodigoUsuario = @codigoUsuario 
+                                    AND FechaPago >= DATEADD(YEAR, -1, @fechaPago)";
+                    }
+
+                    using (SqlCommand validationCmd = new SqlCommand(validationQuery, conn))
+                    {
+                        validationCmd.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
+                        validationCmd.Parameters.AddWithValue("@fechaPago", fechaPago);
+
+                        int existingPayments = (int)validationCmd.ExecuteScalar();
+
+                        if (existingPayments > 0)
+                        {
+                            if (tipoPago == "Mensual")
+                            {
+                                MessageBox.Show("Ya tiene un pago realizado en este mes.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                            else
+                            {
+                                MessageBox.Show("Ya tiene un pago anual vigente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                            return; // Salir del método si ya existe un pago
+                        }
+                    }
+
+                    // Si no hay pagos existentes, proceder con la inserción
+                    string insertQuery = @"INSERT INTO Pagos (CodigoUsuario, Cedula, UsuarioSistema, FechaPago, MontoPago, TipoPago) 
+                                   VALUES (@codigoUsuario, @cedula, @nombres, @fechaPago, @montoPago, @tipoPago)";
+
+                    using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                    {
+                        // Añadir los parámetros para la consulta
+                        cmd.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
+                        cmd.Parameters.AddWithValue("@cedula", cedula);
+                        cmd.Parameters.AddWithValue("@nombres", nombres);
+                        cmd.Parameters.AddWithValue("@fechaPago", fechaPago);
+                        cmd.Parameters.AddWithValue("@montoPago", montoPago);
+                        cmd.Parameters.AddWithValue("@tipoPago", tipoPago);
+
+                        // Ejecutar la consulta de inserción
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Pago registrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("No se pudo registrar el pago. Intente nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
                 catch (SqlException ex)
@@ -190,35 +240,39 @@ namespace SistemaCobro
 
         private void btnComprobante_Click(object sender, EventArgs e)
         {
-            // Obtener los valores necesarios para generar el comprobante
-            string codigoUsuario = txtCodigo.Text;
-            string cedula = txtCedula.Text;
-            string nombres = txtNombres.Text;
-            DateTime fechaPago = Date.Value;
-            decimal montoPago = RbMensual.Checked ? 10 : 120;
-            string tipoPago = RbMensual.Checked ? "Mensual" : "Anual";
-
-            // Especificar la ruta base donde se guardarán los comprobantes
-            string rutaBase = @"C:\Users\ZenBook\Desktop\Comp";
-
-            // Asegurarse de que la carpeta exista
-            Directory.CreateDirectory(rutaBase);
-
-            // Crear el nombre del archivo PDF
-            string nombreArchivo = $"Comprobante_{cedula}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
-            string rutaCompleta = Path.Combine(rutaBase, nombreArchivo);
-
-            try
+            if (RbMensual.Checked || RbAnual.Checked)
             {
-                Rectangle tamañoPapel = new Rectangle(288f, 500f); // 288 puntos = 4 pulgadas, altura arbitrariamente grande
+                // Obtener los valores necesarios para generar el comprobante
+                string codigoUsuario = txtCodigo.Text;
+                string cedula = txtCedula.Text;
+                string nombres = txtNombres.Text;
+                DateTime fechaPago = Date.Value;
+                decimal montoPago = RbMensual.Checked ? 10 : 120;
+                string tipoPago = RbMensual.Checked ? "Mensual" : "Anual";
 
-                // Crear el documento PDF con el tamaño personalizado
-                Document documento = new Document(tamañoPapel, 10f, 10f, 10f, 10f); // Márgenes reducidos
-                PdfWriter writer = PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
+                // Obtener la ruta de la carpeta "Documentos" del usuario
+                string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // Especificar la ruta donde se guardarán los comprobantes, dentro de "Documentos"
+                string rutaBase = Path.Combine(rutaDocumentos, "Comprobantes");
 
-                documento.Open();
+                // Asegurarse de que la carpeta exista
+                Directory.CreateDirectory(rutaBase);
 
-                // Definir fuentes
+                // Crear el nombre del archivo PDF
+                string nombreArchivo = $"Comprobante_{cedula}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+                string rutaCompleta = Path.Combine(rutaBase, nombreArchivo);
+
+                try
+                {
+                    Rectangle tamañoPapel = new Rectangle(288f, 500f); // 288 puntos = 4 pulgadas, altura arbitrariamente grande
+
+                    // Crear el documento PDF con el tamaño personalizado
+                    Document documento = new Document(tamañoPapel, 10f, 10f, 10f, 10f); // Márgenes reducidos
+                    PdfWriter writer = PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
+
+                    documento.Open();
+
+                    // Definir fuentes
                     BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_BOLDITALIC, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                     Font fuenteTitulo = new Font(bf, 16, iTextSharp.text.Font.BOLD);
                     Font fuenteNormal = new Font(bf, 12, iTextSharp.text.Font.NORMAL);
@@ -282,16 +336,21 @@ namespace SistemaCobro
                     documento.Close();
 
 
-                // Confirmar al usuario que el comprobante fue generado
-                MessageBox.Show($"Comprobante PDF generado exitosamente.\nRuta: {rutaCompleta}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Confirmar al usuario que el comprobante fue generado
+                    MessageBox.Show($"Comprobante PDF generado exitosamente.\nRuta: {rutaCompleta}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Abrir el PDF generado
-                System.Diagnostics.Process.Start(rutaCompleta);
+                    // Abrir el PDF generado
+                    System.Diagnostics.Process.Start(rutaCompleta);
+                }
+                catch (Exception ex)
+                {
+                    // Manejar errores durante la generación del PDF
+                    MessageBox.Show($"Error al generar el comprobante PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                // Manejar errores durante la generación del PDF
-                MessageBox.Show($"Error al generar el comprobante PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Seleccione todo los datos requerido", "Dato Requerido",MessageBoxButtons.OK,MessageBoxIcon.Warning);
             }
         }
 
@@ -299,6 +358,22 @@ namespace SistemaCobro
         {
             Form reporte = new Reportes();
             reporte.Show();
+        }
+
+        private void txtBuscar_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private bool ValidarEntrada()
+        {
+            if (string.IsNullOrEmpty(txtBuscar.Text.Trim()))
+            {
+                MessageBox.Show("Ingrese criterio a buscar.", "Dato requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+
+            }
+            return true;
         }
     }
 }
