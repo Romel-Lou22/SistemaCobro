@@ -117,7 +117,7 @@ namespace SistemaCobro
                     iTextSharp.text.Font fuente = FontFactory.GetFont(FontFactory.TIMES, 10, iTextSharp.text.Font.BOLDITALIC);
 
                     // Título del comprobante
-                    Paragraph encabezado = new Paragraph("J.A.A.P.P\nJUNTA ADMINISTRADORA AGUA POTABLE DE PILACOTO\nR.U.C: 0591763007001\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-2690779\n\n", fuente);
+                    Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuente);
                     encabezado.Alignment = Element.ALIGN_CENTER;
                     documento.Add(encabezado);
 

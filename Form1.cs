@@ -12,10 +12,25 @@ namespace SistemaCobro
     {
         // Cadena de conexión a tu base de datos
         private string connectionString = ConfigurationManager.ConnectionStrings["miConexion"].ConnectionString;
+        private AutoCompleteStringCollection autoCompleteCollection;
+
+
+
 
         public Form1()
         {
             InitializeComponent();
+            ConfigureAutocomplete();
+
+        }
+
+        private void ConfigureAutocomplete()
+        {
+            autoCompleteCollection = new AutoCompleteStringCollection();
+            txtBuscar.AutoCompleteMode = AutoCompleteMode.Suggest;
+            txtBuscar.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            txtBuscar.AutoCompleteCustomSource = autoCompleteCollection;
+            LoadAutoCompleteData();
         }
 
         // Evento al cargar el formulario
@@ -28,7 +43,9 @@ namespace SistemaCobro
             toolTip.AutoPopDelay = 5000;  // Tiempo en milisegundos (5 segundos)
             toolTip.InitialDelay = 100;   // Retraso inicial en milisegundos
             toolTip.ReshowDelay = 500;    // Tiempo entre mostrar el tooltip nuevamente
-            toolTip.ShowAlways = true;    
+            toolTip.ShowAlways = true;
+
+            
 
         }
 
@@ -240,7 +257,7 @@ namespace SistemaCobro
 
         private void btnComprobante_Click(object sender, EventArgs e)
         {
-            if (RbMensual.Checked || RbAnual.Checked)
+            if (RbMensual.Checked || RbAnual.Checked )
             {
                 // Obtener los valores necesarios para generar el comprobante
                 string codigoUsuario = txtCodigo.Text;
@@ -279,11 +296,11 @@ namespace SistemaCobro
                     Font fuenteNegrita = new Font(bf, 12, iTextSharp.text.Font.BOLD);
 
                     // Agregar el encabezado
-                    Paragraph titulo = new Paragraph("J.A.A.P.P", fuenteTitulo);
+                    Paragraph titulo = new Paragraph("COMITÉ BARRIAL PILACOTO", fuenteTitulo);
                     titulo.Alignment = Element.ALIGN_CENTER;
                     documento.Add(titulo);
 
-                    Paragraph subtitulo = new Paragraph("JUNTA ADMINISTRADORA AGUA POTABLE DE PILACOTO", fuenteNegrita);
+                    Paragraph subtitulo = new Paragraph("COMISIÓN CONSTRUCCIÓN IGLESIA", fuenteNegrita);
                     subtitulo.Alignment = Element.ALIGN_CENTER;
                     documento.Add(subtitulo);
 
@@ -295,11 +312,11 @@ namespace SistemaCobro
                         documento.Add(p);
                     }
 
-                    AgregarParrafoCentrado("R.U.C: 0591763007001");
+                    AgregarParrafoCentrado("R.U.C: 00000000000000");
                     AgregarParrafoCentrado("PROVINCIA: COTOPAXI CANTON: LATACUNGA");
                     AgregarParrafoCentrado("CIUDAD: PILACOTO COMUNA: PILACOTO");
                     AgregarParrafoCentrado("DIRECCIÓN: PILACOTO");
-                    AgregarParrafoCentrado("TELEFONO.: 03-2690779");
+                    AgregarParrafoCentrado("TELEFONO.: 03-0000000");
                     documento.Add(new Paragraph("\n"));
 
                     // Agregar los detalles del pago
@@ -360,10 +377,7 @@ namespace SistemaCobro
             reporte.Show();
         }
 
-        private void txtBuscar_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+       
 
         private bool ValidarEntrada()
         {
@@ -375,5 +389,84 @@ namespace SistemaCobro
             }
             return true;
         }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+            Form Agregar = new NuevoUsuario();
+            Agregar.Show();
+        }
+
+        private void btnDonador_Click(object sender, EventArgs e)
+        {
+            Form donador = new Donadores();
+            donador.Show();
+        }
+
+
+        private void LoadAutoCompleteData()
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT UsuarioSistema FROM Usuarios";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                autoCompleteCollection.Add(reader["UsuarioSistema"].ToString());
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al cargar datos para autocompletado: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        private void txtBuscar_TextChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtBuscar.Text) && !long.TryParse(txtBuscar.Text, out _))
+            {
+                SearchUser(txtBuscar.Text);
+            }
+        }
+
+
+
+        private void SearchUser(string searchTerm)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT TOP 1 CodigoUsuario, Cedula, UsuarioSistema FROM Usuarios WHERE UsuarioSistema LIKE @searchTerm + '%'";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@searchTerm", searchTerm);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                txtCodigo.Text = reader["CodigoUsuario"].ToString();
+                                txtCedula.Text = reader["Cedula"].ToString();
+                                txtNombres.Text = reader["UsuarioSistema"].ToString();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al buscar usuario: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+
     }
 }
