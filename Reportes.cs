@@ -113,8 +113,9 @@ namespace SistemaCobro
                     // Abrir el documento para agregar contenido
                     documento.Open();
 
-                    // Estilo de fuente para el texto
-                    iTextSharp.text.Font fuente = FontFactory.GetFont(FontFactory.TIMES, 10, iTextSharp.text.Font.BOLDITALIC);
+                    // Estilo de fuente para el texto usando Courier
+                    iTextSharp.text.Font fuente = FontFactory.GetFont(FontFactory.COURIER, 10, iTextSharp.text.Font.BOLDITALIC);
+
 
                     // Título del comprobante
                     Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuente);

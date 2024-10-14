@@ -98,7 +98,7 @@ namespace SistemaCobro
             {
                 MessageBox.Show("Llene Todo los campos", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            else if( rowsAffected > 0)
+            else if (rowsAffected > 0)
             {
                 ImprimirComprobante();
             }
@@ -106,7 +106,7 @@ namespace SistemaCobro
             {
                 MessageBox.Show("Inserte datos primero antes de imprimir", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-           
+
         }
 
 
@@ -118,63 +118,72 @@ namespace SistemaCobro
             string nombre = txtNombres.Text;
             string cantidad = txtCantidad.Text;
 
-            // Crear el archivo PDF
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "PDF Document (*.pdf)|*.pdf";
-            saveFileDialog.FileName = $"{nombre}_ComprobanteDonacion.pdf";
+            // Obtener la ruta de la carpeta "Documentos" del usuario
+            string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            // Especificar la ruta donde se guardarán los comprobantes, dentro de "Documentos"
+            string rutaBase = Path.Combine(rutaDocumentos, "Comprobantes");
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            // Asegurarse de que la carpeta exista
+            Directory.CreateDirectory(rutaBase);
+
+            // Crear el nombre del archivo PDF
+            string nombreArchivo = $"Comprobante_{cedula}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string rutaCompleta = Path.Combine(rutaBase, nombreArchivo);
+
+            try
             {
-                try
-                {
-                    // Tamaño del papel personalizado
-                    Rectangle tamañoPapel = new Rectangle(288f, 500f);
+                // Tamaño del papel personalizado
+                Rectangle tamañoPapel = new Rectangle(288f, 500f);
 
-                    // Crear el documento PDF con el tamaño especificado
-                    Document doc = new Document(tamañoPapel, 20f, 20f, 30f, 30f); // Aumentamos los márgenes
-                    PdfWriter.GetInstance(doc, new FileStream(saveFileDialog.FileName, FileMode.Create));
+                // Crear el documento PDF con el tamaño especificado
+                Document doc = new Document(tamañoPapel, 20f, 20f, 30f, 30f); // Aumentamos los márgenes
+                PdfWriter.GetInstance(doc, new FileStream(rutaCompleta, FileMode.Create));
 
-                    // Abrir el documento
-                    doc.Open();
+                // Abrir el documento
+                doc.Open();
 
-                    // Crear una fuente personalizada
-                    Font fuenteTitulo = new Font(iTextSharp.text.Font.FontFamily.HELVETICA, 12f, iTextSharp.text.Font.BOLD);  // Fuente para títulos
-                    Font fuenteContenido = new Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10f, iTextSharp.text.Font.NORMAL);  // Fuente para contenido normal
+                // Crear una fuente profesional para recibos, estilo "Courier"
+                Font fuenteTitulo = new Font(iTextSharp.text.Font.FontFamily.COURIER, 12f, iTextSharp.text.Font.BOLD);  // Fuente para títulos
+                Font fuenteContenido = new Font(iTextSharp.text.Font.FontFamily.COURIER, 10f, iTextSharp.text.Font.NORMAL);  // Fuente para contenido
 
-                    // Agregar el encabezado
-                    Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuenteTitulo);
-                    encabezado.Alignment = Element.ALIGN_CENTER;
-                    doc.Add(encabezado);
+                // Agregar el encabezado
+                Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuenteTitulo);
+                encabezado.Alignment = Element.ALIGN_CENTER;
+                doc.Add(encabezado);
 
-                    // Agregar una línea divisoria
-                    doc.Add(new Paragraph("====================================================================================", fuenteContenido));
+                // Agregar una línea divisoria
+                doc.Add(new Paragraph("========================================", fuenteContenido));
 
-                    // Agregar los datos ingresados
-                    doc.Add(new Paragraph($"Código: {codigo}", fuenteContenido));
-                    doc.Add(new Paragraph($"Cédula: {cedula}", fuenteContenido));
-                    doc.Add(new Paragraph($"Nombre: {nombre}", fuenteContenido));
-                    doc.Add(new Paragraph($"Cantidad: {cantidad}", fuenteContenido));
+                // Agregar los datos ingresados
+                doc.Add(new Paragraph($"Código: {codigo}", fuenteContenido));
+                doc.Add(new Paragraph($"Cédula: {cedula}", fuenteContenido));
+                doc.Add(new Paragraph($"Nombre: {nombre}", fuenteContenido));
+                doc.Add(new Paragraph($"Cantidad: {cantidad}", fuenteContenido));
 
-                    // Agregar otra línea divisoria
-                    doc.Add(new Paragraph("====================================================================================", fuenteContenido));
+                // Agregar otra línea divisoria
+                doc.Add(new Paragraph("========================================", fuenteContenido));
 
-                    // Mensaje de agradecimiento
-                    Paragraph gracias = new Paragraph("GRACIAS POR SU DONACIÓN", fuenteTitulo);
-                    gracias.Alignment = Element.ALIGN_CENTER;
-                    doc.Add(gracias);
+                // Mensaje de agradecimiento
+                Paragraph gracias = new Paragraph("GRACIAS POR SU DONACIÓN", fuenteTitulo);
+                gracias.Alignment = Element.ALIGN_CENTER;
+                doc.Add(gracias);
 
-                    // Cerrar el documento
-                    doc.Close();
+                // Cerrar el documento
+                doc.Close();
 
-                    MessageBox.Show("El PDF ha sido generado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al generar el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show("El PDF ha sido generado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Abrir el archivo PDF automáticamente
+                System.Diagnostics.Process.Start(rutaCompleta);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al generar el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+
     }
 }
+
 

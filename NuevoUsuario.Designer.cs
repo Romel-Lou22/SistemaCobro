@@ -29,6 +29,7 @@ namespace SistemaCobro
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -40,6 +41,7 @@ namespace SistemaCobro
             this.label5 = new System.Windows.Forms.Label();
             this.btnLimpiar = new System.Windows.Forms.Button();
             this.btnGuardar = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -89,6 +91,7 @@ namespace SistemaCobro
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(271, 39);
             this.txtCodigo.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.txtCodigo, "Ingrese solo numeros.");
             // 
             // txtCedula
             // 
@@ -97,6 +100,7 @@ namespace SistemaCobro
             this.txtCedula.Name = "txtCedula";
             this.txtCedula.Size = new System.Drawing.Size(271, 39);
             this.txtCedula.TabIndex = 5;
+            this.toolTip1.SetToolTip(this.txtCedula, "Ingrese solo Numeros.");
             // 
             // txtNombres
             // 
@@ -126,13 +130,16 @@ namespace SistemaCobro
             // 
             // btnLimpiar
             // 
+            this.btnLimpiar.AutoSize = true;
             this.btnLimpiar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(247)))));
             this.btnLimpiar.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLimpiar.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnLimpiar.Image = global::SistemaCobro.Properties.Resources.borrar;
-            this.btnLimpiar.Location = new System.Drawing.Point(561, 318);
+            this.btnLimpiar.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnLimpiar.Location = new System.Drawing.Point(552, 344);
+            this.btnLimpiar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 3);
             this.btnLimpiar.Name = "btnLimpiar";
-            this.btnLimpiar.Size = new System.Drawing.Size(89, 108);
+            this.btnLimpiar.Size = new System.Drawing.Size(98, 94);
             this.btnLimpiar.TabIndex = 9;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -141,12 +148,14 @@ namespace SistemaCobro
             // 
             // btnGuardar
             // 
+            this.btnGuardar.AutoSize = true;
             this.btnGuardar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(247)))));
             this.btnGuardar.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuardar.Image = global::SistemaCobro.Properties.Resources.guardar_datos;
-            this.btnGuardar.Location = new System.Drawing.Point(208, 330);
+            this.btnGuardar.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnGuardar.Location = new System.Drawing.Point(198, 344);
             this.btnGuardar.Name = "btnGuardar";
-            this.btnGuardar.Size = new System.Drawing.Size(77, 96);
+            this.btnGuardar.Size = new System.Drawing.Size(89, 94);
             this.btnGuardar.TabIndex = 8;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -158,7 +167,7 @@ namespace SistemaCobro
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(247)))));
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 481);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnGuardar);
@@ -170,6 +179,7 @@ namespace SistemaCobro
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.MaximizeBox = false;
             this.Name = "NuevoUsuario";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "NuevoUsuario";
@@ -191,5 +201,6 @@ namespace SistemaCobro
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnLimpiar;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

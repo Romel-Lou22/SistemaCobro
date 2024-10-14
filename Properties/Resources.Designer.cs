@@ -103,6 +103,16 @@ namespace SistemaCobro.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dar_dinero {
+            get {
+                object obj = ResourceManager.GetObject("dar-dinero", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap disquete {
             get {
                 object obj = ResourceManager.GetObject("disquete", resourceCulture);

@@ -30,6 +30,7 @@ namespace SistemaCobro
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.label1 = new System.Windows.Forms.Label();
             this.txtBuscar = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -48,10 +49,10 @@ namespace SistemaCobro
             this.button1 = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnDonador = new System.Windows.Forms.Button();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.btnReporte = new System.Windows.Forms.Button();
             this.btnBuscar = new System.Windows.Forms.Button();
-            this.btnDonador = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -95,10 +96,11 @@ namespace SistemaCobro
             // 
             // btnCobrar
             // 
+            this.btnCobrar.AutoSize = true;
             this.btnCobrar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCobrar.Location = new System.Drawing.Point(166, 514);
+            this.btnCobrar.Location = new System.Drawing.Point(196, 520);
             this.btnCobrar.Name = "btnCobrar";
-            this.btnCobrar.Size = new System.Drawing.Size(108, 38);
+            this.btnCobrar.Size = new System.Drawing.Size(108, 42);
             this.btnCobrar.TabIndex = 5;
             this.btnCobrar.Text = "Cobrar";
             this.btnCobrar.UseVisualStyleBackColor = true;
@@ -107,7 +109,7 @@ namespace SistemaCobro
             // btnComprobante
             // 
             this.btnComprobante.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnComprobante.Location = new System.Drawing.Point(456, 514);
+            this.btnComprobante.Location = new System.Drawing.Point(549, 514);
             this.btnComprobante.Name = "btnComprobante";
             this.btnComprobante.Size = new System.Drawing.Size(181, 48);
             this.btnComprobante.TabIndex = 6;
@@ -206,11 +208,12 @@ namespace SistemaCobro
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(713, 272);
+            this.button1.Location = new System.Drawing.Point(791, 272);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 37);
             this.button1.TabIndex = 16;
             this.button1.Text = "TEST";
+            this.toolTip.SetToolTip(this.button1, "Conexión base de datos.");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
@@ -223,26 +226,48 @@ namespace SistemaCobro
             this.label7.Size = new System.Drawing.Size(410, 45);
             this.label7.TabIndex = 18;
             this.label7.Text = "SISTEMA COBRO PILACOTO";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // btnDonador
+            // 
+            this.btnDonador.BackColor = System.Drawing.SystemColors.Control;
+            this.btnDonador.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDonador.Image = global::SistemaCobro.Properties.Resources.dar_dinero;
+            this.btnDonador.ImageAlign = System.Drawing.ContentAlignment.TopRight;
+            this.btnDonador.Location = new System.Drawing.Point(719, 161);
+            this.btnDonador.Name = "btnDonador";
+            this.btnDonador.Size = new System.Drawing.Size(92, 91);
+            this.btnDonador.TabIndex = 20;
+            this.btnDonador.Text = "Donador";
+            this.btnDonador.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.toolTip.SetToolTip(this.btnDonador, "Registro y Comprobante donadores.");
+            this.btnDonador.UseVisualStyleBackColor = false;
+            this.btnDonador.Click += new System.EventHandler(this.btnDonador_Click);
             // 
             // btnAgregar
             // 
+            this.btnAgregar.AutoSize = true;
             this.btnAgregar.BackColor = System.Drawing.SystemColors.Control;
             this.btnAgregar.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAgregar.Image = global::SistemaCobro.Properties.Resources.usuario;
-            this.btnAgregar.Location = new System.Drawing.Point(679, 31);
+            this.btnAgregar.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnAgregar.Location = new System.Drawing.Point(719, 52);
             this.btnAgregar.Name = "btnAgregar";
-            this.btnAgregar.Size = new System.Drawing.Size(92, 115);
+            this.btnAgregar.Size = new System.Drawing.Size(92, 94);
             this.btnAgregar.TabIndex = 19;
             this.btnAgregar.Text = "Agregar";
             this.btnAgregar.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.toolTip.SetToolTip(this.btnAgregar, "Agregar nuevo usuario.");
             this.btnAgregar.UseVisualStyleBackColor = false;
             this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
             // 
             // btnReporte
             // 
+            this.btnReporte.AutoSize = true;
             this.btnReporte.BackColor = System.Drawing.SystemColors.Control;
             this.btnReporte.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnReporte.Image = global::SistemaCobro.Properties.Resources.analisis_de_los_datos__1_;
+            this.btnReporte.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnReporte.Location = new System.Drawing.Point(549, 161);
             this.btnReporte.Name = "btnReporte";
             this.btnReporte.Size = new System.Drawing.Size(99, 91);
@@ -254,34 +279,26 @@ namespace SistemaCobro
             // 
             // btnBuscar
             // 
+            this.btnBuscar.AutoSize = true;
             this.btnBuscar.BackColor = System.Drawing.SystemColors.Control;
             this.btnBuscar.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBuscar.Image = global::SistemaCobro.Properties.Resources.find_search_locate_9572__1_;
-            this.btnBuscar.Location = new System.Drawing.Point(549, 59);
+            this.btnBuscar.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnBuscar.Location = new System.Drawing.Point(549, 52);
             this.btnBuscar.Name = "btnBuscar";
-            this.btnBuscar.Size = new System.Drawing.Size(88, 87);
+            this.btnBuscar.Size = new System.Drawing.Size(99, 94);
             this.btnBuscar.TabIndex = 2;
             this.btnBuscar.Text = "Buscar";
             this.btnBuscar.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnBuscar.UseVisualStyleBackColor = false;
             this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click_1);
             // 
-            // btnDonador
-            // 
-            this.btnDonador.Location = new System.Drawing.Point(679, 426);
-            this.btnDonador.Name = "btnDonador";
-            this.btnDonador.Size = new System.Drawing.Size(89, 50);
-            this.btnDonador.TabIndex = 20;
-            this.btnDonador.Text = "Donador";
-            this.btnDonador.UseVisualStyleBackColor = true;
-            this.btnDonador.Click += new System.EventHandler(this.btnDonador_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(800, 598);
+            this.ClientSize = new System.Drawing.Size(878, 598);
             this.Controls.Add(this.btnDonador);
             this.Controls.Add(this.btnAgregar);
             this.Controls.Add(this.label7);
@@ -303,6 +320,7 @@ namespace SistemaCobro
             this.Controls.Add(this.btnBuscar);
             this.Controls.Add(this.txtBuscar);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
