@@ -158,7 +158,8 @@ namespace SistemaCobro
                 doc.Add(new Paragraph($"Código: {codigo}", fuenteContenido));
                 doc.Add(new Paragraph($"Cédula: {cedula}", fuenteContenido));
                 doc.Add(new Paragraph($"Nombre: {nombre}", fuenteContenido));
-                doc.Add(new Paragraph($"Cantidad: {cantidad}", fuenteContenido));
+                
+                doc.Add(new Paragraph($"Cantidad: ${cantidad:F2}", fuenteContenido));
 
                 // Agregar otra línea divisoria
                 doc.Add(new Paragraph("========================================", fuenteContenido));

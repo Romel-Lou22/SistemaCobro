@@ -199,61 +199,64 @@ namespace SistemaCobro
                         }
                     }
 
-                    // Validar si ya existe un pago según el tipo
-                    string validationQuery = "";
+
+
+
+                    // Nueva validación para comprobar si existe un pago anual vigente
+                    string validationQueryAnualVigente = @"
+                SELECT TOP 1 FechaPago 
+                FROM Pagos 
+                WHERE CodigoUsuario = @codigoUsuario 
+                AND TipoPago = 'Anual'
+                AND FechaPago <= @fechaPago
+                ORDER BY FechaPago DESC";
+
+                    using (SqlCommand validationCmdAnualVigente = new SqlCommand(validationQueryAnualVigente, conn))
+                    {
+                        validationCmdAnualVigente.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
+                        validationCmdAnualVigente.Parameters.AddWithValue("@fechaPago", fechaPago);
+
+                        object result = validationCmdAnualVigente.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            DateTime ultimoPagoAnual = (DateTime)result;
+                            if (fechaPago < ultimoPagoAnual.AddYears(1))
+                            {
+                                MessageBox.Show($"Ya tiene un pago anual vigente hasta {ultimoPagoAnual.AddYears(1).ToShortDateString()}. No puede realizar ningún pago hasta después de esa fecha.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+                        }
+                    }
+
+                    // Si no hay pago anual vigente, procedemos con las validaciones específicas por tipo de pago
                     if (tipoPago == "Mensual")
                     {
-                        validationQuery = @"SELECT COUNT(*) FROM Pagos 
-                                    WHERE CodigoUsuario = @codigoUsuario 
-                                    AND TipoPago = 'Anual'
-                                    AND YEAR(FechaPago) = YEAR(@fechaPago)";
+                        // Validación para evitar pagos mensuales duplicados en el mismo mes
+                        string validationQueryMensual = @"SELECT COUNT(*) FROM Pagos 
+                                            WHERE CodigoUsuario = @codigoUsuario 
+                                            AND TipoPago = 'Mensual'
+                                            AND MONTH(FechaPago) = MONTH(@fechaPago) 
+                                            AND YEAR(FechaPago) = YEAR(@fechaPago)";
 
-                        using (SqlCommand validationCmd = new SqlCommand(validationQuery, conn))
+                        using (SqlCommand validationCmdMensual = new SqlCommand(validationQueryMensual, conn))
                         {
-                            validationCmd.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
-                            validationCmd.Parameters.AddWithValue("@fechaPago", fechaPago);
+                            validationCmdMensual.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
+                            validationCmdMensual.Parameters.AddWithValue("@fechaPago", fechaPago);
 
-                            int existingAnnualPayments = (int)validationCmd.ExecuteScalar();
+                            int existingMonthlyPayments = (int)validationCmdMensual.ExecuteScalar();
 
-                            if (existingAnnualPayments > 0)
+                            if (existingMonthlyPayments > 0)
                             {
-                                MessageBox.Show("Ya tiene un pago anual registrado este año, no puede realizar un pago mensual.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return; // Salir del método si ya existe un pago anual en el año
+                                MessageBox.Show("Ya tiene un pago mensual registrado este mes.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
                             }
                         }
                     }
-                    else // Anual
-                    {
-                        validationQuery = @"SELECT COUNT(*) FROM Pagos 
-                                    WHERE CodigoUsuario = @codigoUsuario 
-                                    AND TipoPago = 'Anual'
-                                    AND FechaPago >= DATEADD(YEAR, -1, @fechaPago)";
-                    }
 
-                    using (SqlCommand validationCmd = new SqlCommand(validationQuery, conn))
-                    {
-                        validationCmd.Parameters.AddWithValue("@codigoUsuario", codigoUsuario);
-                        validationCmd.Parameters.AddWithValue("@fechaPago", fechaPago);
-
-                        int existingPayments = (int)validationCmd.ExecuteScalar();
-
-                        if (existingPayments > 0)
-                        {
-                            if (tipoPago == "Mensual")
-                            {
-                                MessageBox.Show("Ya tiene un pago realizado en este mes.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            }
-                            else
-                            {
-                                MessageBox.Show("Ya tiene un pago anual vigente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            }
-                            return; // Salir del método si ya existe un pago
-                        }
-                    }
-
-                    // Si no hay pagos existentes, proceder con la inserción
+                    // Si no hay pagos existentes que impidan la operación, proceder con la inserción
                     string insertQuery = @"INSERT INTO Pagos (CodigoUsuario, Cedula, UsuarioSistema, FechaPago, MontoPago, TipoPago) 
-                                   VALUES (@codigoUsuario, @cedula, @nombres, @fechaPago, @montoPago, @tipoPago)";
+                           VALUES (@codigoUsuario, @cedula, @nombres, @fechaPago, @montoPago, @tipoPago)";
 
                     using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                     {
@@ -264,7 +267,7 @@ namespace SistemaCobro
                         cmd.Parameters.AddWithValue("@montoPago", montoPago);
                         cmd.Parameters.AddWithValue("@tipoPago", tipoPago);
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                         rowsAffected = cmd.ExecuteNonQuery();
 
                         if (rowsAffected > 0)
                         {
