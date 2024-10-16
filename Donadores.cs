@@ -150,22 +150,28 @@ namespace SistemaCobro
                 Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuenteTitulo);
                 encabezado.Alignment = Element.ALIGN_CENTER;
                 doc.Add(encabezado);
-
+                // SUBTITULO
+                Paragraph comp = new Paragraph("COMPROBANTE DE DONACIÓN", fuenteContenido);
+                comp.Alignment = Element.ALIGN_CENTER;
+                doc.Add(comp);
                 // Agregar una línea divisoria
-                doc.Add(new Paragraph("========================================", fuenteContenido));
+                doc.Add(new Paragraph("----------------------------------------------------------------------------------", fuenteContenido));
 
                 // Agregar los datos ingresados
                 doc.Add(new Paragraph($"Código: {codigo}", fuenteContenido));
                 doc.Add(new Paragraph($"Cédula: {cedula}", fuenteContenido));
-                doc.Add(new Paragraph($"Nombre: {nombre}", fuenteContenido));
-                
+                doc.Add(new Paragraph($"Nombres: {nombre}", fuenteContenido));
+    
+
                 doc.Add(new Paragraph($"Cantidad: ${cantidad:F2}", fuenteContenido));
 
                 // Agregar otra línea divisoria
-                doc.Add(new Paragraph("========================================", fuenteContenido));
+                doc.Add(new Paragraph("----------------------------------------------------------------------------------", fuenteContenido));
 
                 // Mensaje de agradecimiento
-                Paragraph gracias = new Paragraph("GRACIAS POR SU DONACIÓN", fuenteTitulo);
+                Paragraph gracias = new Paragraph("GRACIAS POR SU DONACIÓN", fuenteContenido
+                    
+                    );
                 gracias.Alignment = Element.ALIGN_CENTER;
                 doc.Add(gracias);
 

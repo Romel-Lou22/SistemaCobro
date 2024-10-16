@@ -87,7 +87,10 @@ namespace SistemaCobro
         {
             if (ValidarD())
             {
-                string cedula = txtBuscar.Text;
+                string codigo = txtBuscar.Text;
+                string cedula = dgvPagos.Rows[0].Cells["Cedula"].Value.ToString();
+                string nombre = dgvPagos.Rows[0].Cells["UsuarioSistema"].Value.ToString();
+
 
                 // Obtener la ruta de la carpeta "Documentos" del usuario
                 string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -115,35 +118,47 @@ namespace SistemaCobro
 
                     // Estilo de fuente para el texto usando Courier
                     iTextSharp.text.Font fuente = FontFactory.GetFont(FontFactory.COURIER, 10, iTextSharp.text.Font.BOLDITALIC);
+                    iTextSharp.text.Font titulo = FontFactory.GetFont(FontFactory.COURIER, 12, iTextSharp.text.Font.BOLD);
 
 
                     // Título del comprobante
-                    Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", fuente);
+                    Paragraph encabezado = new Paragraph("COMITÉ BARRIAL PILACOTO\nCOMISIÓN CONSTRUCCIÓN IGLESIA\nR.U.C: 000000000000\nPROVINCIA: COTOPAXI CANTÓN: LATACUNGA\nCIUDAD: PILACOTO COMUNA: PILACOTO\nDIRECCIÓN: PILACOTO\nTELÉFONO: 03-0000000\n\n", titulo);
                     encabezado.Alignment = Element.ALIGN_CENTER;
                     documento.Add(encabezado);
 
                     // Espacio entre el encabezado y el contenido
                     documento.Add(new Paragraph("\n"));
+                    documento.Add(new Paragraph("-----------REPORTE PAGOS REALIZADOS---------",fuente));
+                    documento.Add(new Paragraph("\n"));
+                    //DATOS DE LA PERSONA
+                    documento.Add(new Paragraph($"Codigo: {codigo}",fuente));
+                    documento.Add(new Paragraph($"Cedula: {cedula}",fuente));
+                    documento.Add(new Paragraph($"Nombre: {nombre}",fuente));
+                    documento.Add(new Paragraph("\n"));
 
                     // Crear una tabla de 2 columnas
-                    PdfPTable tabla = new PdfPTable(2);
+                    PdfPTable tabla = new PdfPTable(3);
                     tabla.WidthPercentage = 100; // Ocupar el 100% del ancho de la página
 
                     // Agregar celdas con los nombres de los encabezados de las columnas
-                    PdfPCell celda1 = new PdfPCell(new Phrase("Descripción", fuente));
+                    PdfPCell celda1 = new PdfPCell(new Phrase("Fecha", fuente));
                     PdfPCell celda2 = new PdfPCell(new Phrase("Valor", fuente));
+                    PdfPCell celda3 = new PdfPCell(new Phrase("TipoPago",fuente));
 
                     // Alineación del texto en las celdas
                     celda1.HorizontalAlignment = Element.ALIGN_CENTER;
                     celda2.HorizontalAlignment = Element.ALIGN_CENTER;
+                    celda3.HorizontalAlignment = Element.ALIGN_CENTER;
 
                     // Color de fondo de las celdas de encabezado (opcional)
                     celda1.BackgroundColor = new BaseColor(200, 200, 200);
                     celda2.BackgroundColor = new BaseColor(200, 200, 200);
+                    celda3.BackgroundColor = new BaseColor(200, 200, 200);
 
                     // Agregar las celdas a la tabla
                     tabla.AddCell(celda1);
                     tabla.AddCell(celda2);
+                    tabla.AddCell(celda3);
 
                     // Aquí puedes agregar los resultados de la búsqueda del reporte
                     // Ejemplo de datos de pago
@@ -151,26 +166,14 @@ namespace SistemaCobro
                     {
                         if (fila.Cells[0].Value != null) // Asegurarse de que la fila no esté vacía
                         {
-                            tabla.AddCell(new Phrase("Código de Usuario", fuente));
-                            tabla.AddCell(new Phrase(fila.Cells["CodigoUsuario"].Value.ToString(), fuente));
-
-                            tabla.AddCell(new Phrase("Nombre del Usuario", fuente));
-                            tabla.AddCell(new Phrase(fila.Cells["UsuarioSistema"].Value.ToString(), fuente));
-
-                            tabla.AddCell(new Phrase("Fecha de Pago", fuente));
-                            // tabla.AddCell(new Phrase(fila.Cells["FechaPago"].Value.ToString(), fuente));
+      
+                           
                             tabla.AddCell(new Phrase(Convert.ToDateTime(fila.Cells["FechaPago"].Value).ToString("dd/MM/yyyy"), fuente));
-
-
-                            tabla.AddCell(new Phrase("Monto de Pago", fuente));
-                            tabla.AddCell(new Phrase(fila.Cells["MontoPago"].Value.ToString(), fuente));
-
-                            tabla.AddCell(new Phrase("Tipo de Pago", fuente));
+                            decimal monto = Convert.ToDecimal(fila.Cells["MontoPago"].Value);
+                            tabla.AddCell(new Phrase($"$ {monto:N2}", fuente));
                             tabla.AddCell(new Phrase(fila.Cells["TipoPago"].Value.ToString(), fuente));
 
-                            // Agregar fila vacía
-                            tabla.AddCell(new Phrase(" ", fuente));
-                            tabla.AddCell(new Phrase(" ", fuente));
+                           
                         }
                     }
 
