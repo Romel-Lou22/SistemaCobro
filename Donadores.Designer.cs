@@ -43,6 +43,8 @@ namespace SistemaCobro
             this.btnImprimir = new System.Windows.Forms.Button();
             this.btnRegistrar = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.label6 = new System.Windows.Forms.Label();
+            this.dtpFecha = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // label1
@@ -133,7 +135,7 @@ namespace SistemaCobro
             this.btnImprimir.BackColor = System.Drawing.SystemColors.Control;
             this.btnImprimir.Image = global::SistemaCobro.Properties.Resources.gui_print_icon_157059;
             this.btnImprimir.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnImprimir.Location = new System.Drawing.Point(521, 361);
+            this.btnImprimir.Location = new System.Drawing.Point(561, 472);
             this.btnImprimir.Name = "btnImprimir";
             this.btnImprimir.Size = new System.Drawing.Size(114, 99);
             this.btnImprimir.TabIndex = 10;
@@ -147,7 +149,7 @@ namespace SistemaCobro
             this.btnRegistrar.BackColor = System.Drawing.SystemColors.Control;
             this.btnRegistrar.Image = global::SistemaCobro.Properties.Resources.usuario;
             this.btnRegistrar.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnRegistrar.Location = new System.Drawing.Point(189, 361);
+            this.btnRegistrar.Location = new System.Drawing.Point(189, 472);
             this.btnRegistrar.Name = "btnRegistrar";
             this.btnRegistrar.Size = new System.Drawing.Size(110, 99);
             this.btnRegistrar.TabIndex = 9;
@@ -156,11 +158,31 @@ namespace SistemaCobro
             this.btnRegistrar.UseVisualStyleBackColor = false;
             this.btnRegistrar.Click += new System.EventHandler(this.btnRegistrar_Click);
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(46, 376);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(69, 28);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Fecha:";
+            // 
+            // dtpFecha
+            // 
+            this.dtpFecha.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dtpFecha.Location = new System.Drawing.Point(189, 376);
+            this.dtpFecha.Name = "dtpFecha";
+            this.dtpFecha.Size = new System.Drawing.Size(358, 34);
+            this.dtpFecha.TabIndex = 13;
+            // 
             // Donadores
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 472);
+            this.ClientSize = new System.Drawing.Size(911, 607);
+            this.Controls.Add(this.dtpFecha);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.btnImprimir);
             this.Controls.Add(this.btnRegistrar);
             this.Controls.Add(this.txtCantidad);
@@ -197,5 +219,7 @@ namespace SistemaCobro
         private System.Windows.Forms.Button btnRegistrar;
         private System.Windows.Forms.Button btnImprimir;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.DateTimePicker dtpFecha;
     }
 }

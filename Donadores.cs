@@ -13,6 +13,7 @@ namespace SistemaCobro
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["miConexion"].ConnectionString;
         int rowsAffected;
+        private bool donacionInsertada = false;
         public Donadores()
         {
             InitializeComponent();
@@ -20,12 +21,14 @@ namespace SistemaCobro
 
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
+            donacionInsertada = false;
             // Get values from TextBoxes
             string codigo = txtCodigo.Text;
             string cedula = txtCedula.Text;
             string nombre = txtNombres.Text;
             string cantidad = txtCantidad.Text;  // Fixed field name for 'cantidad'
-
+            DateTime fechaP = DateTime.Now;
+            MessageBox.Show(fechaP.ToString(), "Fecha/Hora actual");
             // Validation for empty fields
             if (string.IsNullOrWhiteSpace(codigo) || string.IsNullOrWhiteSpace(cedula) || string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(cantidad))
             {
@@ -54,7 +57,7 @@ namespace SistemaCobro
             }
 
             // SQL query to insert data
-            string query = "INSERT INTO Donadores(codigo, cedula, nombre, cantidad) VALUES(@codigo, @cedula, @nombre, @cantidad)";
+            string query = "INSERT INTO Donadores(codigo, cedula, nombre, cantidad, fecha) VALUES(@codigo, @cedula, @nombre, @cantidad, @fechaP)";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -68,26 +71,31 @@ namespace SistemaCobro
                         cmd.Parameters.AddWithValue("@cedula", cedula);
                         cmd.Parameters.AddWithValue("@nombre", nombre);
                         cmd.Parameters.AddWithValue("@cantidad", cantidadDecimal);  // Ensure 'cantidad' is decimal
+                        cmd.Parameters.AddWithValue("@fechaP",fechaP);
 
                         rowsAffected = cmd.ExecuteNonQuery();
 
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Datos insertados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            donacionInsertada = true;
                         }
                         else
                         {
                             MessageBox.Show("Error al insertar los datos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            donacionInsertada = false;
                         }
                     }
                 }
                 catch (SqlException ex)
                 {
                     MessageBox.Show($"Error SQL al insertar el donador: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    donacionInsertada = false;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al insertar datos en la tabla: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    donacionInsertada = false;
                 }
             }
         }
@@ -96,17 +104,16 @@ namespace SistemaCobro
         {
             if (string.IsNullOrEmpty(txtCodigo.Text.Trim()) || string.IsNullOrEmpty(txtCedula.Text.Trim()))
             {
-                MessageBox.Show("Llene Todo los campos", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Llene todos los campos", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            else if (rowsAffected > 0)
+            else if (VerificarDonacionInsertada(txtCodigo.Text.Trim(), txtCedula.Text.Trim()))
             {
                 ImprimirComprobante();
             }
             else
             {
-                MessageBox.Show("Inserte datos primero antes de imprimir", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Registre su donación antes de imprimir", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
         }
 
 
@@ -117,6 +124,7 @@ namespace SistemaCobro
             string cedula = txtCedula.Text;
             string nombre = txtNombres.Text;
             string cantidad = txtCantidad.Text;
+            DateTime fechaP = DateTime.Now;
 
             // Obtener la ruta de la carpeta "Documentos" del usuario
             string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -161,6 +169,7 @@ namespace SistemaCobro
                 doc.Add(new Paragraph($"Código: {codigo}", fuenteContenido));
                 doc.Add(new Paragraph($"Cédula: {cedula}", fuenteContenido));
                 doc.Add(new Paragraph($"Nombres: {nombre}", fuenteContenido));
+                doc.Add(new Paragraph($"FechaPago:{fechaP}",fuenteContenido));
     
 
                 doc.Add(new Paragraph($"Cantidad: ${cantidad:F2}", fuenteContenido));
@@ -188,6 +197,57 @@ namespace SistemaCobro
                 MessageBox.Show($"Error al generar el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+        //VALIDACIÓN  PARA VERIFICAR
+        private bool VerificarDonacionInsertada(string codigo, string cedula)
+        {
+            bool donacionRegistrada = false;
+            string queryVerificar = "SELECT COUNT(*) FROM Donadores WHERE codigo = @codigo AND cedula = @cedula";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(queryVerificar, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@codigo", codigo);
+                        cmd.Parameters.AddWithValue("@cedula", cedula);
+
+                        int count = (int)cmd.ExecuteScalar();
+                        donacionRegistrada = (count > 0);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    MessageBox.Show($"Error SQL al verificar la donación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al verificar la donación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            return donacionRegistrada;
+        }
+
+       /* private void btnImprimir_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtCodigo.Text.Trim()) || string.IsNullOrEmpty(txtCedula.Text.Trim()))
+            {
+                MessageBox.Show("Llene todos los campos", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else if (VerificarDonacionInsertada(txtCodigo.Text.Trim(), txtCedula.Text.Trim()))
+            {
+                ImprimirComprobante();
+            }
+            else
+            {
+                MessageBox.Show("Registre su donación antes de imprimir", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+       */
+
 
 
     }

@@ -14,6 +14,7 @@ namespace SistemaCobro
         private string connectionString = ConfigurationManager.ConnectionStrings["miConexion"].ConnectionString;
         private AutoCompleteStringCollection autoCompleteCollection;
         int rowsAffected;
+        bool donacionInsertada = false;
 
 
 
@@ -272,20 +273,24 @@ namespace SistemaCobro
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Pago registrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            donacionInsertada = true;
                         }
                         else
                         {
                             MessageBox.Show("No se pudo registrar el pago. Intente nuevamente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            donacionInsertada = false;
                         }
                     }
                 }
                 catch (SqlException ex)
                 {
                     MessageBox.Show("Error SQL: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    donacionInsertada = false;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    donacionInsertada = false;
                 }
             }
         }
@@ -294,125 +299,16 @@ namespace SistemaCobro
         private void btnComprobante_Click(object sender, EventArgs e)
         {
             //  COMPROBANTE VALIDACIONES
-            if (rowsAffected > 0)
+            if (donacionInsertada)
             {
-                if (RbMensual.Checked || RbAnual.Checked)
-                {
-                    // Obtener los valores necesarios para generar el comprobante
-                    string codigoUsuario = txtCodigo.Text;
-                    string cedula = txtCedula.Text;
-                    string nombres = txtNombres.Text;
-                    DateTime fechaPago = Date.Value;
-                    decimal montoPago = RbMensual.Checked ? 10 : 120;
-                    string tipoPago = RbMensual.Checked ? "Mensual" : "Anual";
-
-                    // Obtener la ruta de la carpeta "Documentos" del usuario
-                    string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    // Especificar la ruta donde se guardarán los comprobantes, dentro de "Documentos"
-                    string rutaBase = Path.Combine(rutaDocumentos, "Comprobantes");
-
-                    // Asegurarse de que la carpeta exista
-                    Directory.CreateDirectory(rutaBase);
-
-                    // Crear el nombre del archivo PDF
-                    string nombreArchivo = $"Comprobante_{cedula}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
-                    string rutaCompleta = Path.Combine(rutaBase, nombreArchivo);
-
-                    try
-                    {
-                        Rectangle tamañoPapel = new Rectangle(288f, 500f); // 288 puntos = 4 pulgadas, altura arbitrariamente grande
-
-                        // Crear el documento PDF con el tamaño personalizado
-                        Document documento = new Document(tamañoPapel, 10f, 10f, 10f, 10f); // Márgenes reducidos
-                        PdfWriter writer = PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
-
-                        documento.Open();
-
-                        // Definir fuentes usando Courier
-                        BaseFont bf = BaseFont.CreateFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-                        Font fuenteTitulo = new Font(bf, 16, iTextSharp.text.Font.BOLD);  // Fuente para títulos en negrita
-                        Font fuenteNormal = new Font(bf, 12, iTextSharp.text.Font.NORMAL);  // Fuente normal
-                        Font fuenteNegrita = new Font(bf, 12, iTextSharp.text.Font.BOLD);  // Fuente en negrita para el contenido
-
-                        // Agregar el encabezado
-                        Paragraph titulo = new Paragraph("COMITÉ BARRIAL PILACOTO", fuenteTitulo);
-                        titulo.Alignment = Element.ALIGN_CENTER;
-                        documento.Add(titulo);
-
-                        Paragraph subtitulo = new Paragraph("COMISIÓN CONSTRUCCIÓN IGLESIA", fuenteNegrita);
-                        subtitulo.Alignment = Element.ALIGN_CENTER;
-                        documento.Add(subtitulo);
-
-                        // Función para agregar párrafos centrados
-                        void AgregarParrafoCentrado(string texto)
-                        {
-                            Paragraph p = new Paragraph(texto, fuenteNormal);
-                            p.Alignment = Element.ALIGN_CENTER;
-                            documento.Add(p);
-                        }
-
-                        AgregarParrafoCentrado("R.U.C: 00000000000000");
-                        AgregarParrafoCentrado("PROVINCIA: COTOPAXI CANTON: LATACUNGA");
-                        AgregarParrafoCentrado("CIUDAD: PILACOTO COMUNA: PILACOTO");
-                        AgregarParrafoCentrado("DIRECCIÓN: PILACOTO");
-                        AgregarParrafoCentrado("TELEFONO.: 03-0000000");
-                        documento.Add(new Paragraph("\n"));
-
-                        // Agregar los detalles del pago
-                        Paragraph tituloPago = new Paragraph("Comprobante de Pago", fuenteNegrita);
-                        tituloPago.Alignment = Element.ALIGN_CENTER;
-                        documento.Add(tituloPago);
-
-                        documento.Add(new Paragraph("--------------------------------------------------------------------------", fuenteNormal));
-
-                        // Función para agregar detalles con alineación y formato
-                        void AgregarDetalle(string etiqueta, string valor)
-                        {
-                            Paragraph p = new Paragraph();
-                            p.Add(new Chunk(etiqueta + ": ", fuenteNegrita));
-                            p.Add(new Chunk(valor, fuenteNormal));
-                            documento.Add(p);
-                        }
-
-                        AgregarDetalle("Código Usuario", codigoUsuario);
-                        AgregarDetalle("Cédula", cedula);
-                        AgregarDetalle("Nombres", nombres);
-                        AgregarDetalle("Fecha de Pago", fechaPago.ToShortDateString());
-                        AgregarDetalle("Tipo de Pago", tipoPago);
-                        AgregarDetalle("Monto Pagado", montoPago.ToString("C"));
-
-                        documento.Add(new Paragraph("--------------------------------------------------------------------------", fuenteNormal));
-
-                        Paragraph gracias = new Paragraph("Gracias por su pago.", fuenteNegrita);
-                        gracias.Alignment = Element.ALIGN_CENTER;
-                        documento.Add(gracias);
-                        float altoReal = writer.GetVerticalPosition(false) - documento.BottomMargin;
-                        documento.SetPageSize(new Rectangle(288f, altoReal));
-
-                        documento.Close();
-
-
-                        // Confirmar al usuario que el comprobante fue generado
-                        MessageBox.Show($"Comprobante PDF generado exitosamente.\nRuta: {rutaCompleta}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Abrir el PDF generado
-                        System.Diagnostics.Process.Start(rutaCompleta);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Manejar errores durante la generación del PDF
-                        MessageBox.Show($"Error al generar el comprobante PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Seleccione todo los datos requerido", "Dato Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                imprimirComprobante();
+               
+                donacionInsertada = false;
 
             }
             else
             {
-                MessageBox.Show("Realice el pago antes de imprimir comprobante", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Registre el pago antes de imprimir comprobante", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -510,6 +406,123 @@ namespace SistemaCobro
                     MessageBox.Show("Error al buscar usuario: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void imprimirComprobante()
+        {
+            if (RbMensual.Checked || RbAnual.Checked)
+            {
+                // Obtener los valores necesarios para generar el comprobante
+                string codigoUsuario = txtCodigo.Text;
+                string cedula = txtCedula.Text;
+                string nombres = txtNombres.Text;
+                DateTime fechaPago = Date.Value;
+                decimal montoPago = RbMensual.Checked ? 10 : 120;
+                string tipoPago = RbMensual.Checked ? "Mensual" : "Anual";
+
+                // Obtener la ruta de la carpeta "Documentos" del usuario
+                string rutaDocumentos = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // Especificar la ruta donde se guardarán los comprobantes, dentro de "Documentos"
+                string rutaBase = Path.Combine(rutaDocumentos, "Comprobantes");
+
+                // Asegurarse de que la carpeta exista
+                Directory.CreateDirectory(rutaBase);
+
+                // Crear el nombre del archivo PDF
+                string nombreArchivo = $"Comprobante_{cedula}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+                string rutaCompleta = Path.Combine(rutaBase, nombreArchivo);
+
+                try
+                {
+                    Rectangle tamañoPapel = new Rectangle(288f, 500f); // 288 puntos = 4 pulgadas, altura arbitrariamente grande
+
+                    // Crear el documento PDF con el tamaño personalizado
+                    Document documento = new Document(tamañoPapel, 10f, 10f, 10f, 10f); // Márgenes reducidos
+                    PdfWriter writer = PdfWriter.GetInstance(documento, new FileStream(rutaCompleta, FileMode.Create));
+
+                    documento.Open();
+
+                    // Definir fuentes usando Courier
+                    BaseFont bf = BaseFont.CreateFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                    Font fuenteTitulo = new Font(bf, 16, iTextSharp.text.Font.BOLD);  // Fuente para títulos en negrita
+                    Font fuenteNormal = new Font(bf, 12, iTextSharp.text.Font.NORMAL);  // Fuente normal
+                    Font fuenteNegrita = new Font(bf, 12, iTextSharp.text.Font.BOLD);  // Fuente en negrita para el contenido
+
+                    // Agregar el encabezado
+                    Paragraph titulo = new Paragraph("COMITÉ BARRIAL PILACOTO", fuenteTitulo);
+                    titulo.Alignment = Element.ALIGN_CENTER;
+                    documento.Add(titulo);
+
+                    Paragraph subtitulo = new Paragraph("COMISIÓN CONSTRUCCIÓN IGLESIA", fuenteNegrita);
+                    subtitulo.Alignment = Element.ALIGN_CENTER;
+                    documento.Add(subtitulo);
+
+                    // Función para agregar párrafos centrados
+                    void AgregarParrafoCentrado(string texto)
+                    {
+                        Paragraph p = new Paragraph(texto, fuenteNormal);
+                        p.Alignment = Element.ALIGN_CENTER;
+                        documento.Add(p);
+                    }
+
+                    AgregarParrafoCentrado("R.U.C: 00000000000000");
+                    AgregarParrafoCentrado("PROVINCIA: COTOPAXI CANTON: LATACUNGA");
+                    AgregarParrafoCentrado("CIUDAD: PILACOTO COMUNA: PILACOTO");
+                    AgregarParrafoCentrado("DIRECCIÓN: PILACOTO");
+                    AgregarParrafoCentrado("TELEFONO.: 03-0000000");
+                    documento.Add(new Paragraph("\n"));
+
+                    // Agregar los detalles del pago
+                    Paragraph tituloPago = new Paragraph("Comprobante de Pago", fuenteNegrita);
+                    tituloPago.Alignment = Element.ALIGN_CENTER;
+                    documento.Add(tituloPago);
+
+                    documento.Add(new Paragraph("--------------------------------------------------------------------------", fuenteNormal));
+
+                    // Función para agregar detalles con alineación y formato
+                    void AgregarDetalle(string etiqueta, string valor)
+                    {
+                        Paragraph p = new Paragraph();
+                        p.Add(new Chunk(etiqueta + ": ", fuenteNegrita));
+                        p.Add(new Chunk(valor, fuenteNormal));
+                        documento.Add(p);
+                    }
+
+                    AgregarDetalle("Código Usuario", codigoUsuario);
+                    AgregarDetalle("Cédula", cedula);
+                    AgregarDetalle("Nombres", nombres);
+                    AgregarDetalle("Fecha de Pago", fechaPago.ToShortDateString());
+                    AgregarDetalle("Tipo de Pago", tipoPago);
+                    AgregarDetalle("Monto Pagado", montoPago.ToString("C"));
+
+                    documento.Add(new Paragraph("--------------------------------------------------------------------------", fuenteNormal));
+
+                    Paragraph gracias = new Paragraph("Gracias por su pago.", fuenteNegrita);
+                    gracias.Alignment = Element.ALIGN_CENTER;
+                    documento.Add(gracias);
+                    float altoReal = writer.GetVerticalPosition(false) - documento.BottomMargin;
+                    documento.SetPageSize(new Rectangle(288f, altoReal));
+
+                    documento.Close();
+
+
+                    // Confirmar al usuario que el comprobante fue generado
+                    MessageBox.Show($"Comprobante PDF generado exitosamente.\nRuta: {rutaCompleta}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Abrir el PDF generado
+                    System.Diagnostics.Process.Start(rutaCompleta);
+                }
+                catch (Exception ex)
+                {
+                    // Manejar errores durante la generación del PDF
+                    MessageBox.Show($"Error al generar el comprobante PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Seleccione todo los datos requerido", "Dato Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
         }
 
 
